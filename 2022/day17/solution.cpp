@@ -133,6 +133,16 @@ int main(void)
     vector <int64_t> nBlocksSize;
     /* Maximum height of chamber */
     int64_t nChamberHeight = 0;
+    /* Increment to chamber height after seeing a patern */
+    int64_t nChambHeightInc = 0;
+    /* Previous chamber height */
+    int64_t nPrevChambHeight = 0;
+    /* Difference between chamber heights */
+    int64_t nChambDiff = 0;
+    /* Difference between curr block and prev block indices */
+    int64_t nBlockDiff = 0;
+    /* Index of previous block */
+    int64_t nPrevBlock = 0;
 
     /* Set the starting 0'th height position of chamber to blocked */
     for (cnt3 = 0; cnt3 < 7; cnt3++)
@@ -166,8 +176,10 @@ int main(void)
         nBlocksSize.push_back(nBlocksIdx[cnt6][0].size());
     }
 
+    int64_t nTotalBlocks = 2022;
+
     /* Iterate for a total of 2022 values */
-    for (cnt3 = 0; cnt3 < 2022; cnt3++)
+    for (cnt3 = 0; cnt3 < nTotalBlocks; cnt3++)
     {
         /* Clear the current analysis block */
         nBlockIdx[0].clear();
@@ -301,6 +313,207 @@ int main(void)
 
     /* Display the chamber height */
     cout << "Part (a): " << nChamberHeight << endl;
+
+
+    /* Reset the parameters for part b */
+
+    nChamber.clear();
+
+    /* Set the starting 0'th height position of chamber to blocked */
+    for (cnt3 = 0; cnt3 < 7; cnt3++)
+    {
+        nChamber[cnt3] = 1;
+    }
+
+    nChamberHeight = 0;
+    nLeftRightIdx = 0;
+    nCurrBlock = 0;
+    nTotalBlocks = 1000000000000;
+
+    /* Iterate for a total of 2022 values */
+    for (cnt3 = 0; cnt3 < nTotalBlocks; cnt3++)
+    {
+        /* Clear the current analysis block */
+        nBlockIdx[0].clear();
+        nBlockIdx[1].clear();
+
+        /* Store the co-ordinates of the analysis block from the nBlocksIdx */
+        for (cnt4 = 0; cnt4 < nBlocksSize[nCurrBlock]; cnt4++)
+        {
+            nBlockIdx[0].push_back(nBlocksIdx[nCurrBlock][0][cnt4]);
+            /* Increment the chamber height in the Y co-ordinate */
+            nBlockIdx[1].push_back(nBlocksIdx[nCurrBlock][1][cnt4] + nChamberHeight);
+        }
+
+        /* Collect the number of co-ordinates */
+        int64_t nBlockIdx0Size = nBlockIdx[0].size();
+        cnt6 = 1;
+
+        int64_t nMaxRightXValue = *max_element(nBlockIdx[0].begin(), nBlockIdx[0].end());
+        int64_t nMaxLeftXValue = *min_element(nBlockIdx[0].begin(), nBlockIdx[0].end());
+
+        /* Iterate until the blocks cannot move */
+        while (cnt6 > 0)
+        {
+            cnt6 = 0;
+            /* If seeing a ">", move the blocks to the right if possible */
+            if (leftRightStr[nLeftRightIdx] == '>')
+            {
+                /* Get the value of maximum X index to check if the it could
+                 * be moved to the right */
+                if (nMaxRightXValue < 6)
+                {
+                    /* if it could be moved to the right, check if there is no
+                     * block in the chamber obstructing it */
+                    for (cnt4 = 0; cnt4 < nBlockIdx0Size; cnt4++)
+                    {
+                        if (nChamber[(7 * nBlockIdx[1][cnt4]) + (nBlockIdx[0][cnt4] + 1)] == 1)
+                        {
+                            break;
+                        }
+                    }
+                    /* If there is no block obstructing it, move all the blocks
+                     * to the right */
+                    if (cnt4 == nBlockIdx0Size)
+                    {
+                        for (cnt4 = 0; cnt4 < nBlockIdx0Size; cnt4++)
+                        {
+                            nBlockIdx[0][cnt4] = nBlockIdx[0][cnt4] + 1;
+                        }
+                        /* Increment the value of right and left maximums as
+                         * the whole block has right shifted */
+                        nMaxRightXValue++;
+                        nMaxLeftXValue++;
+                    }
+                }
+            }
+            /* If seeing a "<", move the blocks to the left if possible */
+            else
+            {
+                /* Get the value of minimum X index to check if the it could
+                 * be moved to the left */
+                if (nMaxLeftXValue > 0)
+                {
+                    /* if it could be moved to the left, check if there is no
+                     * block in the chamber obstructing it */
+                    for (cnt4 = 0; cnt4 < nBlockIdx0Size; cnt4++)
+                    {
+                        if (nChamber[(7 * nBlockIdx[1][cnt4]) + (nBlockIdx[0][cnt4] - 1)] == 1)
+                        {
+                            break;
+                        }
+                    }
+                    /* If there is no block obstructing it, move all the blocks
+                     * to the left */
+                    if (cnt4 == nBlockIdx0Size)
+                    {
+                        for (cnt4 = 0; cnt4 < nBlockIdx0Size; cnt4++)
+                        {
+                            nBlockIdx[0][cnt4] = nBlockIdx[0][cnt4] - 1;
+                        }
+                        /* Decrement the value of right and left maximums as
+                         * the whole block has left shifted */
+                        nMaxLeftXValue--;
+                        nMaxRightXValue--;
+                    }
+                }
+            }
+
+            /* Now try to move all the blocks one step down */
+            for (cnt4 = 0; cnt4 < nBlockIdx0Size; cnt4++)
+            {
+                /* If there is a block obstructing it do not move it down */
+                if (nBlockIdx[1][cnt4] > 0 && (nChamber[(7*(nBlockIdx[1][cnt4]-1)) + nBlockIdx[0][cnt4]] == 1))
+                {
+                    break;
+                }
+            }
+            /* If there is no block in chamber obstructing it, move the entire
+             * block one step down */
+            if (cnt4 == nBlockIdx0Size)
+            {
+                for (cnt4 = 0; cnt4 < nBlockIdx0Size; cnt4++)
+                {
+                    nBlockIdx[1][cnt4] = nBlockIdx[1][cnt4] - 1;
+                }
+                cnt6++;
+            }
+
+            /* Wrap around the left right string index if overflown
+             * nLeftRightIdx = (nLeftRightIdx + 1) MOD leftRightStr.size() */
+            nLeftRightIdx++;
+            if (nLeftRightIdx >= (int64_t)leftRightStr.size())
+            {
+                /* Check if the difference between chamber height is remaining
+                 * constant */
+                if ((nChambDiff == (nChamberHeight - nPrevChambHeight)) &&
+                    (nBlockDiff == (cnt3 - nPrevBlock)))
+                {
+                    /* If the difference is constant increment a counter */
+                    ++cnt7;
+                }
+                else
+                {
+                    /* if it does not, reset the counter */
+                    cnt7 = 0;
+                }
+
+                /* Check this for around 10 iterations, and for the past 10
+                 * iterations, if the count remains same, then just reduce
+                 * the block count*/
+                if (cnt7 > 5)
+                {
+                    /* Theory: For every nBlockDiff, the chamber increases by
+                     * nChambDiff.
+                     *
+                     * From the remaining blocks to be processed, find the
+                     * number of nBlockDiff packs of blocks that form nChambDiff
+                     * height.
+                     * If one nBlockDiff gives nChambDiff height, then nBlockDiff
+                     * packs gives a height of nChambDiff * pack
+                     *
+                     * Let cnt9 store the value of the number of packs
+                     */
+                    cnt9 = (nTotalBlocks - cnt3) / nBlockDiff;
+                    /* Chamber height to be increased by cnt9 * nChambDiff
+                     * height */
+                    nChambHeightInc += cnt9 * nChambDiff;
+                    /* Increment the value of count, cnt3 by the packs * nBlockDiff
+                     * as equivalently, so many blocks are processed */
+                    cnt3 += cnt9 * nBlockDiff;
+                }
+                /* Chamber height difference = current chamber height minus prev
+                 * chamber height */
+                nChambDiff = nChamberHeight - nPrevChambHeight;
+                /* Assign previous chamber height to current chamber height */
+                nPrevChambHeight = nChamberHeight;
+                /* Calculate the number of blocks difference = current block idx
+                 * minus previous block index */
+                nBlockDiff = cnt3 - nPrevBlock;
+                /* Assign previous block idx to current block idx */
+                nPrevBlock = cnt3;
+
+                nLeftRightIdx -= leftRightStr.size();
+            }
+        }
+
+        /* Block the value of the index in chamber that the block is currently at */
+        for (cnt4 = 0; cnt4 < nBlockIdx0Size; cnt4++)
+        {
+            nChamber[(7 * nBlockIdx[1][cnt4]) + (nBlockIdx[0][cnt4])] = 1;
+        }
+        /* Increment the block number, wrap around the total blocks if exceeding */
+        nCurrBlock++;
+        if (nCurrBlock >= cnt2)
+        {
+            nCurrBlock -= cnt2;
+        }
+        /* Get the maximum height of the chamber */
+        nChamberHeight = max(nChamberHeight, *max_element(nBlockIdx[1].begin(), nBlockIdx[1].end()));
+    }
+
+    /* Display the chamber height */
+    cout << "Part (b): " << nChamberHeight + nChambHeightInc << endl;
 
     auto endTime = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsedSecs = endTime-startTime;
