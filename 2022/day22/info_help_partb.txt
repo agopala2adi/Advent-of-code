@@ -1,0 +1,60 @@
+
+             _ _
+            |_|_|        01
+           _|_|          2
+          |_|_|         34
+          |_|           5
+
+Right(0) x_max++ -> Right(1) x_0++  (y)
+    Dir 0  to 0
+Down(0) y_max++ -> Down(2)y_0++ (x)
+    Dir 1 to 1
+Left(0) x_0-- -> Right(3) x_0++ (y -> -y)
+    Dir 2 to 0
+Up(0) y_0-- -> Right(5) x_0++ (x -> y)
+    Dir 3 to 0
+
+Right(1) x_max++ -> Left(4) x_max-- (y -> -y)
+    Dir 0 to 2
+Down(1) y_max++-> Left(2) x_max-- (x -> y)
+    Dir 1 to 2
+Left(1) x_0-- -> Left(0) x_max-- (y -> y)
+    Dir 2 to 2
+Up(1) y_0-- -> Up(5) y_max-- (x -> x)
+    Dir 3  to 3
+
+Right(2) x_max++ -> Up(1) y_max-- (y -> x)
+    Dir 0 to 3
+Down(2)y_max++ -> Down(4) y_0++ (x->x)
+    Dir 1 to 1
+Left(2) x_0-- -> Down(3) y_0++ (y -> x)
+    Dir 2 to 1
+Up(2) y_0-- -> Up(0) y_max-- (x -> x)
+    Dir 3 to 3
+
+Right(3) x_max++ -> Right(4) x_0++ (y -> y)
+    Dir 0 to 0
+Down(3) y_max++ -> Down(5) y_0++ (x -> x)
+    Dir 1 to 1
+Left(3) x_0-- -> Right(0) x_0++ (y -> -y)
+    Dir 2 to 0
+Up(3) y_0-- -> Right(2) x_0++ (x -> y)
+    Dir 3 to 0
+
+Right(4) x_max++ -> Left(1) x_max-- (y -> -y)
+    Dir 0 to 2
+Down(4) y_max++ -> Left(5) x_max-- (x -> y)
+    Dir 1 to 2
+Left(4) x_0-- -> Left(3) x_max-- (y -> y)
+    Dir 2 to 2
+Up(4) y_0-- -> Up(2) y_max-- (x -> x)
+    Dir 3 to 3
+
+Right(5) x_max++ -> Up(4) y_max-- (y -> x)
+    Dir 0 to 3
+Down(5) y_max++ -> Down(1) y_0++ (x -> x)
+    Dir 1 to 1
+Left(5) x_0-- -> Down(0) y_0++ (y -> x)
+    Dir 2 to 1
+Up(5) y_0-- -> Up(3) y_max-- (x -> x)
+    Dir 3 to 3
