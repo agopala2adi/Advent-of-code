@@ -360,39 +360,40 @@ int64_t getPressurePartB(int64_t nMyStartIdx,
             {
                 continue;
             }
+            /* Calculate the reamining time for me and the elephant */
+            nMyRemainingTime = (nMyCurrTime - gnShortCost[nMyStartIdx][gnNonZeroRate[nCnt1]] - 1);
+            nElRemainingTime = (nElCurrTime - gnShortCost[nElStartIdx][gnNonZeroRate[nCnt2]] - 1);
+
             /* If there is enough time to visit the next valve and open it (1 more
              * than the cost to open the valve) then go into the valve and open it */
-            if ((nMyCurrTime > (gnShortCost[nMyStartIdx][gnNonZeroRate[nCnt1]] + 1)) ||
-                (nElCurrTime > (gnShortCost[nElStartIdx][gnNonZeroRate[nCnt2]] + 1)))
+            if (nMyRemainingTime > 0 || nElRemainingTime > 0)
             {
                 /* If I have enough time to go and open the valve */
-                if (nMyCurrTime > (gnShortCost[nMyStartIdx][gnNonZeroRate[nCnt1]] + 1))
+                if (nMyRemainingTime > 0)
                 {
                     /* Open the valve and set the already opened flag to true */
                     nAlreadyOpened[gnNonZeroRate[nCnt1]] = 1;
                     /* Calculate the total pressure using remaining time and
                      * the current flow rate of the valve */
-                    nPressure += (nMyCurrTime - gnShortCost[nMyStartIdx][gnNonZeroRate[nCnt1]] - 1) * gnValveRate[gnNonZeroRate[nCnt1]];
-                    nMyRemainingTime = (nMyCurrTime - gnShortCost[nMyStartIdx][gnNonZeroRate[nCnt1]] - 1);
+                    nPressure += (nMyRemainingTime * gnValveRate[gnNonZeroRate[nCnt1]]);
                 }
                 else
                 {
-                    /* If I don't have enough time, set the reaming time to -1 */
+                    /* If I don't have enough time, set the remaining time to -1 */
                     nMyRemainingTime = -1;
                 }
                 /* If the elephant has enough time to go and open the valve */
-                if (nElCurrTime > (gnShortCost[nElStartIdx][gnNonZeroRate[nCnt2]] + 1))
+                if (nElRemainingTime > 0)
                 {
                     /* Open the valve and set the already opened flag to true */
                     nAlreadyOpened[gnNonZeroRate[nCnt2]] = 1;
                     /* Calculate the total pressure using remaining time and
                      * the current flow rate of the valve */
-                    nPressure += (nElCurrTime - gnShortCost[nElStartIdx][gnNonZeroRate[nCnt2]] - 1) * gnValveRate[gnNonZeroRate[nCnt2]];
-                    nElRemainingTime = (nElCurrTime - gnShortCost[nElStartIdx][gnNonZeroRate[nCnt2]] - 1);
+                    nPressure += (nElRemainingTime * gnValveRate[gnNonZeroRate[nCnt2]]);
                 }
                 else
                 {
-                    /* If the elephant doesn't have enough time, set the reaming
+                    /* If the elephant doesn't have enough time, set the remaining
                      * time of elephant to -1 */
                     nElRemainingTime = -1;
                 }
@@ -400,10 +401,10 @@ int64_t getPressurePartB(int64_t nMyStartIdx,
                  * valves, using the start idx as the current non-zero opened valve
                  * index). Update the remaining time accordingly */
                 nPressure += getPressurePartB(gnNonZeroRate[nCnt1],
-                                                gnNonZeroRate[nCnt2],
-                                                nMyRemainingTime,
-                                                nElRemainingTime,
-                                                nAlreadyOpened);
+                                              gnNonZeroRate[nCnt2],
+                                              nMyRemainingTime,
+                                              nElRemainingTime,
+                                              nAlreadyOpened);
                 /* Set already opened back to zero, as now we will move instead
                  * to a different valve as though we have not touched the valve */
                 if (nMyRemainingTime != -1)
