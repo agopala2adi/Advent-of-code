@@ -15,6 +15,7 @@ using namespace std;
 char input_file[] = "input.txt";
 char arr[100][20000];
 
+
 int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
