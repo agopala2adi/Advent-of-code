@@ -102,9 +102,6 @@ int main(void)
         /* Store the part b result in sequenceP2, create a copy in sequenceCpyP2 */
         sequenceP2.push_back(y);
         sequenceCpyP2.push_back(y);
-		// cout << "(" << x << ", " << y << ")"<< endl;
-		// cout << "(" << sequence[cnt1] << ", " << sequenceP2[cnt1] << ")"<< endl;
-		// getchar();
         /* Increment the count */
         ++cnt1;
     }
