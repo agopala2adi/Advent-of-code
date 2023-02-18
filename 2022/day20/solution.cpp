@@ -68,15 +68,15 @@ int main(void)
 
     /* To make each value unique, multiply the index number with a large value
      * and add the number */
-    int64_t nMaxIndex = 100000000000000;
-    int64_t decryptionKey = 811589153;
+    int64_t nMaxIndex = 100000000000000ll;
+    int64_t decryptionKey = 811589153ll;
 
     /* Read every line */
     while (feof(fp) == 0)
     {
         int64_t x;
         int64_t y;
-        fscanf(fp, "%ld\n", &x);
+        fscanf(fp, "%" PRId64 "\n",&x);
         if (x == 0)
         {
             /* Store the index of zero */
@@ -88,13 +88,13 @@ int main(void)
          * number times index plus number */
         if (x < 0)
         {
-            x = (-cnt1 * nMaxIndex) + x;
-            y = (-cnt1 * nMaxIndex) + y;
+            x = (int64_t)(((int64_t)-cnt1 * (int64_t)nMaxIndex) + (int64_t)x);
+            y = (int64_t)(((int64_t)-cnt1 * (int64_t)nMaxIndex) + (int64_t)y);
         }
         else
         {
-            x = cnt1 * nMaxIndex + x;
-            y = cnt1 * nMaxIndex + y;
+            x = (int64_t)((int64_t)cnt1 * (int64_t)nMaxIndex) + (int64_t)x;
+            y = (int64_t)((int64_t)cnt1 * (int64_t)nMaxIndex) + (int64_t)y;
         }
         /* Store the result in sequence, create a copy in sequenceCpy */
         sequence.push_back(x);
@@ -102,6 +102,9 @@ int main(void)
         /* Store the part b result in sequenceP2, create a copy in sequenceCpyP2 */
         sequenceP2.push_back(y);
         sequenceCpyP2.push_back(y);
+		// cout << "(" << x << ", " << y << ")"<< endl;
+		// cout << "(" << sequence[cnt1] << ", " << sequenceP2[cnt1] << ")"<< endl;
+		// getchar();
         /* Increment the count */
         ++cnt1;
     }
@@ -203,7 +206,7 @@ int main(void)
     cnt6 += cnt5;
 
     /* Display the value after finding the sum at 1000'th 2000'th and 3000'th positon */
-    cout << "Part (a): " << cnt6 << endl;
+    cout << "Part (a): " << (int64_t)cnt6 << endl;
 
     /* Run the same loop for 10 iterations */
     for (cnt10 = 0; cnt10 < 10; cnt10++)
@@ -305,7 +308,7 @@ int main(void)
     cnt6 += cnt5;
 
     /* Display the value after finding the sum at 1000'th 2000'th and 3000'th positon */
-    cout << "Part (b): " << cnt6 << endl;
+    cout << "Part (b): " << (int64_t)cnt6 << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
