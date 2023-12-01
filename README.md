@@ -15,10 +15,12 @@ g++ --std=c++17 solution.cpp
 
 If `g++` is old or you see errors while compiling, update `g++` on Ubuntu using:
 ```bash
+sudo apt update
 sudo apt install gcc g++
 ```
 
 Note: 
 - Do not forget to modify my input to your input to check your solution
-- Please do let me know incase you are unable to build or if the solution is wrong
-- Also, let me know in case you want to understand my solution.
+- Please do let me know in case you are unable to build or if find my solution to be incorrect
+- Also, let me know in case you want to understand my solution
+
