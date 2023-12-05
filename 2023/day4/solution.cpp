@@ -48,7 +48,7 @@ int main(void)
     int64_t nLines = 0;
 
     /* The number of copies for each card */
-    vector <int64_t> nCardCopies;
+    int64_t nCardCopies[500];
 
     int64_t nPartOneSum = 0;
     int64_t nPartTwoSum = 0;
@@ -57,7 +57,7 @@ int main(void)
     while (fgets(arr[cnt1], sizeof(arr[cnt1]), fp) != NULL)
     {
         /* Set copies to 1 initially */
-        nCardCopies.push_back(1);
+        nCardCopies[cnt1] = 1;
         /* Increment count to move to next line */
         ++cnt1;
     }
@@ -69,8 +69,8 @@ int main(void)
     {
         stringstream iss(arr[cnt1]);
         string word;
-        vector<string> vsWinners;
-        vector<string> vsMine;
+        vector<int64_t> vsWinners;
+        vector<int64_t> vsMine;
         int64_t nWinners = 0;
 
         /* Read the first and second word - card and number - not relevant */
@@ -81,13 +81,13 @@ int main(void)
         while ((iss >> word) && word != "|")
         {
             /* Store them in winners list */
-            vsWinners.push_back(word);
+            vsWinners.push_back(atoi(word.c_str()));
         }
         /* After that, read all of my cards */
         while ((iss >> word))
         {
             /* Store them in my card list */
-            vsMine.push_back(word);
+            vsMine.push_back(atoi(word.c_str()));
         }
         nWinners = 0;
 
