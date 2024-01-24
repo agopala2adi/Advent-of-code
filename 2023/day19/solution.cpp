@@ -23,9 +23,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -69,7 +76,7 @@ int main(void)
 
         /* If encountering a new line, then increment a flag for identifying
          * the next set of x,m,a,s inputs */
-        if (workflows.size() < 2)
+        if (workflows.size() < 3)
         {
             cnt3++;
         }

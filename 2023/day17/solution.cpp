@@ -73,9 +73,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -117,10 +124,20 @@ int main(void)
     /* Read each line from file */
     while (fgets(arr[cnt1], sizeof(arr[cnt1]), fp) != NULL)
     {
+        string sInpLine = arr[cnt1];
+
+        /* Remove the last new line character(s) */
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+
         /* Read the matrix and store them in heat loss vector of strings */
-        heatLoss.push_back(arr[cnt1]);
-        /* Remove the last new line character */
-        heatLoss[heatLoss.size()-1].pop_back();
+        heatLoss.push_back(sInpLine);
 
         /* Increment count to move to next line */
         ++cnt1;

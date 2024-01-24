@@ -17,9 +17,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -49,9 +56,9 @@ int main(void)
     int64_t nPartOneSum = 0;
     int64_t nPartTwoSum = 0;
 
-    vector <string> nInputRocks;
-    vector <string> nFirstInput;
-    vector <string> nInputRocksAfterMin;
+    vector <string> vsInputRocks;
+    vector <string> vsFirstInput;
+    vector <string> vsInputRocksAfterMin;
 
     int64_t nRunMin = 1000ll;
     int64_t nTotalRun = 1000000000ll; 
@@ -59,10 +66,20 @@ int main(void)
     /* Read each line from file */
     while (fgets(arr[cnt1], sizeof(arr[cnt1]), fp) != NULL)
     {
-        /* Read inputs and store into input rocks */
-        nInputRocks.push_back(arr[cnt1]);
+        string sInpLine = arr[cnt1];
+
         /* Remove the last '\n' */
-        nInputRocks[nInputRocks.size()-1].pop_back();
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+
+        /* Read inputs and store into input rocks */
+        vsInputRocks.push_back(sInpLine);
         /* Increment count to move to next line */
         ++cnt1;
     }
@@ -74,21 +91,21 @@ int main(void)
         /* Increment count */
         cnt9++;
         /* North roll */
-        for (cnt2 = 0; cnt2 < nInputRocks[0].size(); cnt2++)
+        for (cnt2 = 0; cnt2 < vsInputRocks[0].size(); cnt2++)
         {
-            for (cnt3 = 0; cnt3 < nInputRocks.size()-1; cnt3++)
+            for (cnt3 = 0; cnt3 < vsInputRocks.size()-1; cnt3++)
             {
-                if (nInputRocks[cnt3][cnt2] == '.')
+                if (vsInputRocks[cnt3][cnt2] == '.')
                 {
-                    for (cnt4 = cnt3+1; cnt4 < nInputRocks.size(); cnt4++)
+                    for (cnt4 = cnt3+1; cnt4 < vsInputRocks.size(); cnt4++)
                     {
-                        if (nInputRocks[cnt4][cnt2] == 'O')
+                        if (vsInputRocks[cnt4][cnt2] == 'O')
                         {
-                            nInputRocks[cnt4][cnt2] = '.';
-                            nInputRocks[cnt3][cnt2] = 'O'; 
+                            vsInputRocks[cnt4][cnt2] = '.';
+                            vsInputRocks[cnt3][cnt2] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt4][cnt2] == '#')
+                        else if (vsInputRocks[cnt4][cnt2] == '#')
                         {
                             break;
                         }
@@ -97,26 +114,26 @@ int main(void)
             }
         }
         /* Store the input for part 1 */ 
-        if (nFirstInput.size() == 0)
+        if (vsFirstInput.size() == 0)
         {
-            nFirstInput = nInputRocks;
+            vsFirstInput = vsInputRocks;
         }
         /* West roll */
-        for (cnt2 = 0; cnt2 < nInputRocks.size(); cnt2++)
+        for (cnt2 = 0; cnt2 < vsInputRocks.size(); cnt2++)
         {
-            for (cnt3 = 0; cnt3 < nInputRocks[0].size()-1; cnt3++)
+            for (cnt3 = 0; cnt3 < vsInputRocks[0].size()-1; cnt3++)
             {
-                if (nInputRocks[cnt2][cnt3] == '.')
+                if (vsInputRocks[cnt2][cnt3] == '.')
                 {
-                    for (cnt4 = cnt3+1; cnt4 < nInputRocks[0].size(); cnt4++)
+                    for (cnt4 = cnt3+1; cnt4 < vsInputRocks[0].size(); cnt4++)
                     {
-                        if (nInputRocks[cnt2][cnt4] == 'O')
+                        if (vsInputRocks[cnt2][cnt4] == 'O')
                         {
-                            nInputRocks[cnt2][cnt4] = '.';
-                            nInputRocks[cnt2][cnt3] = 'O'; 
+                            vsInputRocks[cnt2][cnt4] = '.';
+                            vsInputRocks[cnt2][cnt3] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt2][cnt4] == '#')
+                        else if (vsInputRocks[cnt2][cnt4] == '#')
                         {
                             break;
                         }
@@ -125,21 +142,21 @@ int main(void)
             }
         }
         /* South roll */
-        for (cnt2 = nInputRocks[0].size()-1; cnt2 >= 0; cnt2--)
+        for (cnt2 = vsInputRocks[0].size()-1; cnt2 >= 0; cnt2--)
         {
-            for (cnt3 = nInputRocks.size()-1; cnt3 > 0; cnt3--)
+            for (cnt3 = vsInputRocks.size()-1; cnt3 > 0; cnt3--)
             {
-                if (nInputRocks[cnt3][cnt2] == '.')
+                if (vsInputRocks[cnt3][cnt2] == '.')
                 {
                     for (cnt4 = cnt3-1; cnt4 >= 0; cnt4--)
                     {
-                        if (nInputRocks[cnt4][cnt2] == 'O')
+                        if (vsInputRocks[cnt4][cnt2] == 'O')
                         {
-                            nInputRocks[cnt4][cnt2] = '.';
-                            nInputRocks[cnt3][cnt2] = 'O'; 
+                            vsInputRocks[cnt4][cnt2] = '.';
+                            vsInputRocks[cnt3][cnt2] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt4][cnt2] == '#')
+                        else if (vsInputRocks[cnt4][cnt2] == '#')
                         {
                             break;
                         }
@@ -148,21 +165,21 @@ int main(void)
             }
         }
         /* East roll */
-        for (cnt2 = nInputRocks.size()-1; cnt2 >= 0; cnt2--)
+        for (cnt2 = vsInputRocks.size()-1; cnt2 >= 0; cnt2--)
         {
-            for (cnt3 = nInputRocks[0].size()-1; cnt3 > 0; cnt3--)
+            for (cnt3 = vsInputRocks[0].size()-1; cnt3 > 0; cnt3--)
             {
-                if (nInputRocks[cnt2][cnt3] == '.')
+                if (vsInputRocks[cnt2][cnt3] == '.')
                 {
                     for (cnt4 = cnt3-1; cnt4 >= 0; cnt4--)
                     {
-                        if (nInputRocks[cnt2][cnt4] == 'O')
+                        if (vsInputRocks[cnt2][cnt4] == 'O')
                         {
-                            nInputRocks[cnt2][cnt4] = '.';
-                            nInputRocks[cnt2][cnt3] = 'O'; 
+                            vsInputRocks[cnt2][cnt4] = '.';
+                            vsInputRocks[cnt2][cnt3] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt2][cnt4] == '#')
+                        else if (vsInputRocks[cnt2][cnt4] == '#')
                         {
                             break;
                         }
@@ -175,22 +192,22 @@ int main(void)
          * of current input state into input after min variable */
         if (cnt9 == nRunMin)
         {
-            nInputRocksAfterMin = nInputRocks;
+            vsInputRocksAfterMin = vsInputRocks;
         }
         /* Once we have crossed the minimum run, if the current input value has 
          * reached the input after min again, then break out of main loop */
         else if (cnt9 > nRunMin)
         {
             /* Compare if current input is same as input after min run */
-            for (cnt5 = 0; cnt5 < nInputRocks.size(); cnt5++)
+            for (cnt5 = 0; cnt5 < vsInputRocks.size(); cnt5++)
             {
-                if (nInputRocksAfterMin[cnt5] != nInputRocks[cnt5])
+                if (vsInputRocksAfterMin[cnt5] != vsInputRocks[cnt5])
                 {
                     break;
                 }
             }
             /* If same, store the difference between current inp and run min */
-            if (cnt5 == nInputRocks.size())
+            if (cnt5 == vsInputRocks.size())
             {
                 cnt10 = cnt9-nRunMin;
                 break;
@@ -206,21 +223,21 @@ int main(void)
     {
         cnt9--;
         /* North roll */
-        for (cnt2 = 0; cnt2 < nInputRocks[0].size(); cnt2++)
+        for (cnt2 = 0; cnt2 < vsInputRocks[0].size(); cnt2++)
         {
-            for (cnt3 = 0; cnt3 < nInputRocks.size()-1; cnt3++)
+            for (cnt3 = 0; cnt3 < vsInputRocks.size()-1; cnt3++)
             {
-                if (nInputRocks[cnt3][cnt2] == '.')
+                if (vsInputRocks[cnt3][cnt2] == '.')
                 {
-                    for (cnt4 = cnt3+1; cnt4 < nInputRocks.size(); cnt4++)
+                    for (cnt4 = cnt3+1; cnt4 < vsInputRocks.size(); cnt4++)
                     {
-                        if (nInputRocks[cnt4][cnt2] == 'O')
+                        if (vsInputRocks[cnt4][cnt2] == 'O')
                         {
-                            nInputRocks[cnt4][cnt2] = '.';
-                            nInputRocks[cnt3][cnt2] = 'O'; 
+                            vsInputRocks[cnt4][cnt2] = '.';
+                            vsInputRocks[cnt3][cnt2] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt4][cnt2] == '#')
+                        else if (vsInputRocks[cnt4][cnt2] == '#')
                         {
                             break;
                         }
@@ -229,21 +246,21 @@ int main(void)
             }
         }
         /* West roll */
-        for (cnt2 = 0; cnt2 < nInputRocks.size(); cnt2++)
+        for (cnt2 = 0; cnt2 < vsInputRocks.size(); cnt2++)
         {
-            for (cnt3 = 0; cnt3 < nInputRocks[0].size()-1; cnt3++)
+            for (cnt3 = 0; cnt3 < vsInputRocks[0].size()-1; cnt3++)
             {
-                if (nInputRocks[cnt2][cnt3] == '.')
+                if (vsInputRocks[cnt2][cnt3] == '.')
                 {
-                    for (cnt4 = cnt3+1; cnt4 < nInputRocks[0].size(); cnt4++)
+                    for (cnt4 = cnt3+1; cnt4 < vsInputRocks[0].size(); cnt4++)
                     {
-                        if (nInputRocks[cnt2][cnt4] == 'O')
+                        if (vsInputRocks[cnt2][cnt4] == 'O')
                         {
-                            nInputRocks[cnt2][cnt4] = '.';
-                            nInputRocks[cnt2][cnt3] = 'O'; 
+                            vsInputRocks[cnt2][cnt4] = '.';
+                            vsInputRocks[cnt2][cnt3] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt2][cnt4] == '#')
+                        else if (vsInputRocks[cnt2][cnt4] == '#')
                         {
                             break;
                         }
@@ -252,21 +269,21 @@ int main(void)
             }
         }
         /* South roll */
-        for (cnt2 = nInputRocks[0].size()-1; cnt2 >= 0; cnt2--)
+        for (cnt2 = vsInputRocks[0].size()-1; cnt2 >= 0; cnt2--)
         {
-            for (cnt3 = nInputRocks.size()-1; cnt3 > 0; cnt3--)
+            for (cnt3 = vsInputRocks.size()-1; cnt3 > 0; cnt3--)
             {
-                if (nInputRocks[cnt3][cnt2] == '.')
+                if (vsInputRocks[cnt3][cnt2] == '.')
                 {
                     for (cnt4 = cnt3-1; cnt4 >= 0; cnt4--)
                     {
-                        if (nInputRocks[cnt4][cnt2] == 'O')
+                        if (vsInputRocks[cnt4][cnt2] == 'O')
                         {
-                            nInputRocks[cnt4][cnt2] = '.';
-                            nInputRocks[cnt3][cnt2] = 'O'; 
+                            vsInputRocks[cnt4][cnt2] = '.';
+                            vsInputRocks[cnt3][cnt2] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt4][cnt2] == '#')
+                        else if (vsInputRocks[cnt4][cnt2] == '#')
                         {
                             break;
                         }
@@ -275,21 +292,21 @@ int main(void)
             }
         }
         /* East roll */
-        for (cnt2 = nInputRocks.size()-1; cnt2 >= 0; cnt2--)
+        for (cnt2 = vsInputRocks.size()-1; cnt2 >= 0; cnt2--)
         {
-            for (cnt3 = nInputRocks[0].size()-1; cnt3 > 0; cnt3--)
+            for (cnt3 = vsInputRocks[0].size()-1; cnt3 > 0; cnt3--)
             {
-                if (nInputRocks[cnt2][cnt3] == '.')
+                if (vsInputRocks[cnt2][cnt3] == '.')
                 {
                     for (cnt4 = cnt3-1; cnt4 >= 0; cnt4--)
                     {
-                        if (nInputRocks[cnt2][cnt4] == 'O')
+                        if (vsInputRocks[cnt2][cnt4] == 'O')
                         {
-                            nInputRocks[cnt2][cnt4] = '.';
-                            nInputRocks[cnt2][cnt3] = 'O'; 
+                            vsInputRocks[cnt2][cnt4] = '.';
+                            vsInputRocks[cnt2][cnt3] = 'O'; 
                             break;
                         }
-                        else if (nInputRocks[cnt2][cnt4] == '#')
+                        else if (vsInputRocks[cnt2][cnt4] == '#')
                         {
                             break;
                         }
@@ -301,11 +318,11 @@ int main(void)
 
     /* Compute the count - Part 1 */
     cnt7 = cnt1;
-    for (cnt5 = 0; cnt5 < nInputRocks.size(); cnt5++)
+    for (cnt5 = 0; cnt5 < vsInputRocks.size(); cnt5++)
     {
-        for (cnt6 = 0; cnt6 < nInputRocks[0].size(); cnt6++)
+        for (cnt6 = 0; cnt6 < vsInputRocks[0].size(); cnt6++)
         {
-            if (nFirstInput[cnt5][cnt6] == 'O')
+            if (vsFirstInput[cnt5][cnt6] == 'O')
             {
                 nPartOneSum += cnt7;
             }
@@ -315,11 +332,11 @@ int main(void)
 
     /* Compute the count - Part 2 */
     cnt7 = cnt1;
-    for (cnt5 = 0; cnt5 < nInputRocks.size(); cnt5++)
+    for (cnt5 = 0; cnt5 < vsInputRocks.size(); cnt5++)
     {
-        for (cnt6 = 0; cnt6 < nInputRocks[0].size(); cnt6++)
+        for (cnt6 = 0; cnt6 < vsInputRocks[0].size(); cnt6++)
         {
-            if (nInputRocks[cnt5][cnt6] == 'O')
+            if (vsInputRocks[cnt5][cnt6] == 'O')
             {
                 nPartTwoSum += cnt7;
             }

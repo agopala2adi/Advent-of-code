@@ -17,9 +17,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -60,11 +67,21 @@ int main(void)
     while (fgets(arr[cnt1], sizeof(arr[cnt1]), fp) != NULL)
     {
         string galaxy = arr[cnt1];
+        /* Remove \n and \r */
+        if (galaxy[galaxy.size()-1] == '\n' || galaxy[galaxy.size()-1] == '\r')
+        {
+            galaxy.pop_back();
+        }
+        if (galaxy[galaxy.size()-1] == '\n' || galaxy[galaxy.size()-1] == '\r')
+        {
+            galaxy.pop_back();
+        }
+
         /* Store input into galaxies */
         sGalaxies.push_back(galaxy);
 
         /* Check if the current line is all dots */
-        for (cnt2 = 0; cnt2 < strlen(arr[0])-1; cnt2++)
+        for (cnt2 = 0; cnt2 < galaxy.size(); cnt2++)
         {
             if (arr[cnt1][cnt2] != '.')
             {
@@ -72,7 +89,7 @@ int main(void)
             }
         }
         /* If so, add additional line of dots */
-        if (cnt2 == strlen(arr[0])-1)
+        if (cnt2 == galaxy.size())
         {
             sGalaxies.push_back(galaxy);
             nTotalLines++;
@@ -83,7 +100,7 @@ int main(void)
     }
 
     /* Check for columns, if a column is all dots */
-    for (cnt2 = 0; cnt2 < sGalaxies[0].size()-1; cnt2++)
+    for (cnt2 = 0; cnt2 < sGalaxies[0].size(); cnt2++)
     {
         for (cnt3 = 0; cnt3 < nTotalLines; cnt3++)
         {
@@ -108,7 +125,7 @@ int main(void)
     /* Get all coordinates of galaxies */
     for (cnt2 = 0; cnt2 < nTotalLines; cnt2++)
     {
-        for (cnt3 = 0; cnt3 < sGalaxies[0].size()-1; cnt3++)
+        for (cnt3 = 0; cnt3 < sGalaxies[0].size(); cnt3++)
         {
             if (sGalaxies[cnt2][cnt3] == '#')
             {
@@ -133,7 +150,7 @@ int main(void)
     nDistanceY.clear();
 
     /* Check for columns, if a column is all dots */
-    for (cnt2 = 0; cnt2 < sGalaxies[0].size()-1; cnt2++)
+    for (cnt2 = 0; cnt2 < sGalaxies[0].size(); cnt2++)
     {
         for (cnt3 = 0; cnt3 < nTotalLines; cnt3++)
         {
@@ -158,7 +175,7 @@ int main(void)
     /* Check if the current line is all dots */
     for (cnt1 = 0; cnt1 < nTotalLines; cnt1++)
     {
-        for (cnt2 = 0; cnt2 < sGalaxies[0].size()-1; cnt2++)
+        for (cnt2 = 0; cnt2 < sGalaxies[0].size(); cnt2++)
         {
             if (sGalaxies[cnt1][cnt2] != '.')
             {
@@ -166,7 +183,7 @@ int main(void)
             }
         }
 
-        if (cnt2 == sGalaxies[0].size()-1)
+        if (cnt2 == sGalaxies[0].size())
         {
             sGalaxies.insert(sGalaxies.begin() + cnt1 + 1, sGalaxies[cnt1]);
             cnt1++;
@@ -178,7 +195,7 @@ int main(void)
     /* Get all coordinates of galaxies */
     for (cnt2 = 0; cnt2 < nTotalLines; cnt2++)
     {
-        for (cnt3 = 0; cnt3 < sGalaxies[0].size()-1; cnt3++)
+        for (cnt3 = 0; cnt3 < sGalaxies[0].size(); cnt3++)
         {
             if (sGalaxies[cnt2][cnt3] == '#')
             {

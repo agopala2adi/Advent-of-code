@@ -16,9 +16,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -55,7 +62,7 @@ int main(void)
     {
         int64_t x, y, z; 
         int64_t mx, my, mz; 
-        fscanf(fp, "%lu, %lu, %lu @ %lu, %lu, %lu", &x, &y, &z, &mx, &my, &mz);
+        fscanf(fp, "%" PRId64 ", %" PRId64 ", %" PRId64 " @ %" PRId64 ", %" PRId64 ", %" PRId64, &x, &y, &z, &mx, &my, &mz);
 
         nPos[0].push_back(x);
         nPos[1].push_back(y);

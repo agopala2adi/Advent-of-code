@@ -27,9 +27,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -62,10 +69,20 @@ int main(void)
     /* Read each line from file */
     while (fgets(arr[cnt1], sizeof(arr[cnt1]), fp) != NULL)
     {
-        /* Store the input line in layout's row */
-        layout.push_back(arr[cnt1]);
+        string sInpLine = arr[cnt1];
+
         /* Remove the last '\n' */
-        layout[layout.size()-1].pop_back();
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+
+        /* Store the input line in layout's row */
+        layout.push_back(sInpLine);
 
         beamMove.push_back("");
         /* In beamMove, store line length of dots in each line */

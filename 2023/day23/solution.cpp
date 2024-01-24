@@ -23,9 +23,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -59,10 +66,20 @@ int main(void)
     /* Read each line from file */
     while (fgets(arr[cnt1], sizeof(arr[cnt1]), fp) != NULL)
     {
+        string sInpLine = arr[cnt1];
+
+        /* Remove the last new line character(s) */
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+        if (sInpLine[sInpLine.size()-1] == '\n' || sInpLine[sInpLine.size()-1] == '\r')
+        {
+            sInpLine.pop_back();
+        }
+
         /* Store the input map maze in map puzzle */
-        map_puzzle.push_back(arr[cnt1]);
-        /* Remove new line characters */
-        map_puzzle[map_puzzle.size()-1].pop_back();
+        map_puzzle.push_back(sInpLine);
 
         /* Store zero (part 2) for the path already visited */
         nMoved.push_back(0);

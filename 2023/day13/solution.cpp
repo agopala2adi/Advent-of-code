@@ -12,17 +12,24 @@ using namespace std;
 
 char arr[10000][1000];
 
-bool checkRowReflection(vector<string> nRows, int64_t row_no);
-bool checkColReflection(vector<string> nRows, int64_t col_no);
-int64_t getReflection(vector <string> nRows, int64_t prevSoln);
+bool checkRowReflection(vector<string> vsRows, int64_t row_no);
+bool checkColReflection(vector<string> vsRows, int64_t col_no);
+int64_t getReflection(vector <string> vsRows, int64_t prevSoln);
 
 int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -52,39 +59,41 @@ int main(void)
     int64_t nPartOneSum = 0;
     int64_t nPartTwoSum = 0;
 
-    vector<string> nRows;
-    vector<string> nRows2;
+    vector<string> vsRows;
+    vector<string> vsRows2;
 
     /* Read each line from file */
     while (fgets(arr[cnt1], sizeof(arr[cnt1]), fp) != NULL)
     {
-        /* If seeing new line perform the solution */
-        if (strlen(arr[cnt1]) < 2)
+        /* If seeing new line perform the solution 
+         * New line may have up to two characters, \n and \r 
+        */
+        if (strlen(arr[cnt1]) < 3)
         {
             /* Calculate reflection summarisation value */
-            cnt2 = getReflection(nRows, 0);
+            cnt2 = getReflection(vsRows, 0);
             /* Add to part 1 solution */
             nPartOneSum += cnt2;
 
             /* For part 2, flip each element. Start with columns, then rows */
-            for (cnt4 = 0; cnt4 < nRows.size(); cnt4++)
+            for (cnt4 = 0; cnt4 < vsRows.size(); cnt4++)
             {
-                for (cnt5 = 0; cnt5 < nRows[0].size(); cnt5++)
+                for (cnt5 = 0; cnt5 < vsRows[0].size(); cnt5++)
                 {
                     /* Keep a copy of rows into rows2 */
-                    nRows2 = nRows;
+                    vsRows2 = vsRows;
 
                     /* Flip (cnt4, cnt5) element */
-                    if (nRows[cnt4][cnt5] == '#')
+                    if (vsRows[cnt4][cnt5] == '#')
                     {
-                        nRows2[cnt4][cnt5] = '.';
+                        vsRows2[cnt4][cnt5] = '.';
                     }
-                    else if (nRows[cnt4][cnt5] == '.')
+                    else if (vsRows[cnt4][cnt5] == '.')
                     {
-                        nRows2[cnt4][cnt5] = '#';
+                        vsRows2[cnt4][cnt5] = '#';
                     }
                     /* Get the value of reflection ignoring part 1 solution */
-                    cnt3 = getReflection(nRows2, cnt2);
+                    cnt3 = getReflection(vsRows2, cnt2);
                     /* If the solution is different or not zero, stop computation */
                     if (cnt3 != 0 && cnt2 != cnt3)
                     {
@@ -92,7 +101,7 @@ int main(void)
                     }
                 }
                 /* If found, break out of larger loop */
-                if (cnt5 != nRows[0].size())
+                if (cnt5 != vsRows[0].size())
                 {
                     break;
                 }
@@ -105,43 +114,51 @@ int main(void)
             /* Accumulate into part 2 solution */
             nPartTwoSum += cnt3;
             /* Clear the rows to start accumulating new values */
-            nRows.clear();
+            vsRows.clear();
         }
         else
         {
-            /* Add the current row into rows */
-            nRows.push_back(arr[cnt1]);
+            string sRow = arr[cnt1];
             /* Remove the last '\n' character */
-            nRows[nRows.size()-1].pop_back();
+            if (sRow[sRow.size()-1] == '\n' || sRow[sRow.size()-1] == '\r')
+            {
+                sRow.pop_back();
+            }
+            if (sRow[sRow.size()-1] == '\n' || sRow[sRow.size()-1] == '\r')
+            {
+                sRow.pop_back();
+            }
+            /* Add the current row into rows */
+            vsRows.push_back(sRow);
         }
 
         /* Increment count to move to next line */
         ++cnt1;
     }
     /* For the last set of input, calculate reflection summarisation value */
-    cnt2 = getReflection(nRows, 0);
+    cnt2 = getReflection(vsRows, 0);
     /* Add to part 1 solution */
     nPartOneSum += cnt2;
 
     /* For part 2, flip each element. Start with columns, then rows */
-    for (cnt4 = 0; cnt4 < nRows.size(); cnt4++)
+    for (cnt4 = 0; cnt4 < vsRows.size(); cnt4++)
     {
-        for (cnt5 = 0; cnt5 < nRows[0].size(); cnt5++)
+        for (cnt5 = 0; cnt5 < vsRows[0].size(); cnt5++)
         {
             /* Keep a copy of rows into rows2 */
-            nRows2 = nRows;
+            vsRows2 = vsRows;
 
             /* Flip (cnt4, cnt5) element */
-            if (nRows[cnt4][cnt5] == '#')
+            if (vsRows[cnt4][cnt5] == '#')
             {
-                nRows2[cnt4][cnt5] = '.';
+                vsRows2[cnt4][cnt5] = '.';
             }
-            else if (nRows[cnt4][cnt5] == '.')
+            else if (vsRows[cnt4][cnt5] == '.')
             {
-                nRows2[cnt4][cnt5] = '#';
+                vsRows2[cnt4][cnt5] = '#';
             }
             /* Get the value of reflection ignoring part 1 solution */
-            cnt3 = getReflection(nRows2, cnt2);
+            cnt3 = getReflection(vsRows2, cnt2);
             /* If the solution is different or not zero, stop computation */
             if (cnt3 != 0 && cnt2 != cnt3)
             {
@@ -149,7 +166,7 @@ int main(void)
             }
         }
         /* If found, break out of larger loop */
-        if (cnt5 != nRows[0].size())
+        if (cnt5 != vsRows[0].size())
         {
             break;
         }
@@ -177,20 +194,20 @@ int main(void)
 }
 
 
-int64_t getReflection(vector <string> nRows, int64_t prev_value)
+int64_t getReflection(vector <string> vsRows, int64_t prev_value)
 {
     int64_t cnt1 = 0;
     int64_t cnt2 = 0;
     int64_t cnt3 = 0;
 
-    cnt1 = nRows[0].size();
+    cnt1 = vsRows[0].size();
 
     /* Check row wise reflections first */
-    for (cnt2 = 1; cnt2 < nRows.size(); cnt2++)
+    for (cnt2 = 1; cnt2 < vsRows.size(); cnt2++)
     {
         /* If row reflection is present and if the value is different from
          * previous value, stop the loop and return the answer */
-        if (checkRowReflection(nRows, cnt2))
+        if (checkRowReflection(vsRows, cnt2))
         {
             cnt3 = cnt2*100;
             if (prev_value != cnt3)
@@ -201,13 +218,13 @@ int64_t getReflection(vector <string> nRows, int64_t prev_value)
     }
 
     /* If no reflection in rows, try columns */
-    if (cnt2 == nRows.size())
+    if (cnt2 == vsRows.size())
     {
         for (cnt2 = 1; cnt2 < cnt1; cnt2++)
         {
             /* If column reflection is present and if the value is different from
              * previous value, stop the loop and return the answer */
-            if (checkColReflection(nRows, cnt2))
+            if (checkColReflection(vsRows, cnt2))
             {
                 cnt3 = cnt2;
                 if (prev_value != cnt3)
@@ -223,7 +240,7 @@ int64_t getReflection(vector <string> nRows, int64_t prev_value)
 }
 
 /* Check if the row reflection along with row_no is present */
-bool checkRowReflection(vector<string> nRows, int64_t row_no)
+bool checkRowReflection(vector<string> vsRows, int64_t row_no)
 {
     int64_t cnt1 = 0;
     int64_t cnt2 = 0;
@@ -231,14 +248,14 @@ bool checkRowReflection(vector<string> nRows, int64_t row_no)
 
     /* Compute the minimum value of rows above the line of reflection and rows
      * after the line of reflection */
-    cnt2 = min(int64_t(nRows.size())-row_no, row_no);
+    cnt2 = min(int64_t(vsRows.size())-row_no, row_no);
 
     /* Check if row before is same as row after */
     for (cnt1 = 0; cnt1 < cnt2; cnt1++)
     {
-        for (cnt3 = 0; cnt3 < nRows[0].size(); cnt3++)
+        for (cnt3 = 0; cnt3 < vsRows[0].size(); cnt3++)
         {
-            if (nRows[row_no-cnt1-1][cnt3] != nRows[row_no+cnt1][cnt3])
+            if (vsRows[row_no-cnt1-1][cnt3] != vsRows[row_no+cnt1][cnt3])
             {
                 return false;
             }
@@ -249,7 +266,7 @@ bool checkRowReflection(vector<string> nRows, int64_t row_no)
 }
 
 /* Check if the column reflection along with col_no is present */
-bool checkColReflection(vector<string> nRows, int64_t col_no)
+bool checkColReflection(vector<string> vsRows, int64_t col_no)
 {
     int64_t cnt1 = 0;
     int64_t cnt2 = 0;
@@ -257,14 +274,14 @@ bool checkColReflection(vector<string> nRows, int64_t col_no)
 
     /* Compute the minimum value of rows above the line of reflection and rows
      * after the line of reflection */
-    cnt2 = min(int64_t(nRows[0].size())-col_no, col_no);
+    cnt2 = min(int64_t(vsRows[0].size())-col_no, col_no);
 
     /* Check if col left is same as col right */
     for (cnt1 = 0; cnt1 < cnt2; cnt1++)
     {
-        for (cnt3 = 0; cnt3 < nRows.size(); cnt3++)
+        for (cnt3 = 0; cnt3 < vsRows.size(); cnt3++)
         {
-            if (nRows[cnt3][col_no-cnt1-1] != nRows[cnt3][col_no+cnt1])
+            if (vsRows[cnt3][col_no-cnt1-1] != vsRows[cnt3][col_no+cnt1])
             {
                 return false;
             }

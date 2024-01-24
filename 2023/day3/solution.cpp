@@ -16,9 +16,16 @@ int main(void)
 {
     auto startTime = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(startTime);
-    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     FILE* fp = fopen("input.txt", "r");
+
+    if (fp == nullptr)
+    {
+        cerr << "Cannot open input file." << endl;
+        return -1;
+    }
+
+    cout << "Start Time: " << std::ctime(&start_time) << endl;
 
     fseek(fp, 0L, SEEK_SET);
 
@@ -58,8 +65,14 @@ int main(void)
         ++cnt1;
     }
 
-    /* Get the length of one line and subtract 1 as we do not want "\n"s */
-    cnt2 = strlen(arr[0])-1;
+    /* Get the length of one line and exclude the new line characters (\r and \n) */
+    for (cnt2 = 0; cnt2 < strlen(arr[0]); cnt2++)
+    {
+        if (arr[0][cnt2] == '\n' || arr[0][cnt2] == '\r')
+        {
+            break;
+        }
+    }
 
     /* Loop through all lines */
     for (cnt3 = 0; cnt3 < cnt1; cnt3++)
