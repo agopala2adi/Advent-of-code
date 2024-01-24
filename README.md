@@ -29,7 +29,7 @@ sudo apt install gcc g++
 ```
 
 ### Using Windows
-If `g++` is not present, download and extract [MinGW](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z/download). Add `mingw32/bin` to Windows path.
+If `g++` is not present, refer [Setting up GCC on windows](./GCC%20on%20Windows/README.md).
 
 Note: 
 - Do not forget to modify my input to your input to check your solution
