@@ -142,7 +142,7 @@ int main(void)
         /* Reset all bit numbers to zero before starting */
         memset(nBitNumbers, 0, sizeof(nBitNumbers));
 
-        /* Brute forcing - Number of runs required to run part (a) is 2 ^ (numbers - 1) 
+        /* Brute forcing - Number of runs required to run part (b) is 3 ^ (numbers - 1) 
          * Where each bit represents a +, *, or a concatenation operation
          */
         nNumberOfRuns = pow(3, nNumbers.size()-1);
