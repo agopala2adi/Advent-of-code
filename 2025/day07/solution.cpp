@@ -217,29 +217,18 @@ int64_t calculateOptions(int64_t nX)
 
     /* Move downwards in the manifold until we hit a non-empty space */
     int64_t nStart = nX;
-    
-    while (sLines[nX][nY] == '.' || sLines[nX][nY] == 'S')
+
+    if (nX == sLines.size()-1)
     {
-        nX++;
-        /* If we have already calculated the number of options from this position
-         * return the value quickly 
-        */
-        if (nOptions.find((nX*0x1000000ULL) + nY) != nOptions.end())
-        {
-            return nOptions[(nX*0x1000000ULL) + nY];
-        }
-        /* If we have reached the last line of the manifold */
-        if (nX == sLines.size()-1)
-        {
-            /* All positions from nStart to end, lead to 1 option only 
-             * store that into the hash map or memoize it */
-            for (int64_t cnt = nStart; cnt <= nX; cnt++)
-            {
-                nOptions[(cnt*0x1000000ULL) + nY] = 1;
-            }
-            /* Return 1 option */
-            return 1;
-        }
+        nOptions[(nX*0x1000000ULL) + nY] = 1;
+        return 1;
+    }
+
+    if (sLines[nX][nY] == '.' || sLines[nX][nY] == 'S')
+    {
+        nTotalOptions = calculateOptions((nX + 1)*0x1000000ULL + nY);
+        nOptions[(nX*0x1000000ULL) + nY] = nTotalOptions;
+        return nTotalOptions;
     }
 
     /* If we can move left */
@@ -249,7 +238,7 @@ int64_t calculateOptions(int64_t nX)
         if (sLines[nX][nY] == '^')
         {
             /* Also add to the total options as we need to keep a count */
-            nTotalOptions += calculateOptions((nX*0x1000000ULL) + (nY-1));
+            nTotalOptions = calculateOptions((nX*0x1000000ULL) + (nY-1));
         }
     }
     /* If we can move right */
