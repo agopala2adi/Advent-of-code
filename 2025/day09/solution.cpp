@@ -438,6 +438,23 @@ int main(void)
         }
     }
 
+    /* Sort the same x coordinate lines as per increasing x coordinate 
+     * so that we could use binary search in the next step */
+    sort(vSameX.begin(), vSameX.end(),
+         [](const PointPairs& a, const PointPairs& b)
+         {
+             return a.coord1.first < b.coord1.first;
+         });
+
+    /* Sort the same y coordinate lines as per increasing y coordinate 
+     * so that we could use binary search in the next step */
+    sort(vSameY.begin(), vSameY.end(),
+         [](const PointPairs& a, const PointPairs& b)
+         {
+             return a.coord1.second < b.coord1.second;
+         });
+
+
     /* Now, process each point pair from the priority queue */
     while (!pqPointPair.empty())
     {
@@ -449,96 +466,165 @@ int main(void)
         pair<int64_t, int64_t> coord1 = make_pair(topPointPair.coord1.first, topPointPair.coord2.second);
         pair<int64_t, int64_t> coord2 = make_pair(topPointPair.coord2.first, topPointPair.coord1.second);
 
-        /* First check if the other two diagonal coordinates are on the line or inside */
+        /* First check if the other two diagonal coordinates are on the line or 
+         * inside 
+         * 
+         * If they themselves are not inside, then we start looking at other 
+         * point pairs.
+         */
         if ((checkIfOnLine(coord1) == true || checkIfInside(coord1) == true) &&
             (checkIfOnLine(coord2) == true || checkIfInside(coord2) == true))
         {
-            /* Now, check all four sides (perimeter) of the rectangle formed by the 
-             * point pairs to see if all points on the sides are either
-             * on the line or inside the polygon
+            /* Now, check if there is any line on the polygon that cuts through 
+             * any side of the rectange formed by the point pair.
+             *
+             * Totally, there are four sides to check.
+             * From (nMinX to nMaxX) and (nMinY to nMaxY)
+             * 
+             * (nMinX, nMinY) ------------------ (nMaxX, nMinY)
+             *       |                                  |
+             *       |                                  |
+             *       |                                  |
+             *       |                                  |
+             *       |                                  |
+             * (nMinX, nMaxY) ------------------ (nMaxX, nMaxY)
+             * 
+            */
+            int64_t nMinX = min(topPointPair.coord1.first, topPointPair.coord2.first);
+            int64_t nMaxX = max(topPointPair.coord1.first, topPointPair.coord2.first);
+            int64_t nMinY = min(topPointPair.coord1.second, topPointPair.coord2.second);
+            int64_t nMaxY = max(topPointPair.coord1.second, topPointPair.coord2.second);
+
+            /* Get the first value of (x, y) that has x value greater than min 
+             * value of the x coordinate of the rectange.
+             * lower_bound gives us the first value that is greater than the 
+             * given value.
+             * It uses binary search internally, so it is efficient.
              */
-            /* Start with freezing x coordinate to min x:
-             * min(x1, x2) : min(y1, y2) to max(y1, y2)
-             */
-            cnt3 = min(topPointPair.coord1.first, topPointPair.coord2.first);
-            for (cnt2 = min(topPointPair.coord1.second, topPointPair.coord2.second);
-                 cnt2 <= max(topPointPair.coord1.second, topPointPair.coord2.second);
-                 cnt2++)
+            auto itX = lower_bound(vSameX.begin(), vSameX.end(), nMinX,
+                                  [](const PointPairs& a, const int64_t& value)
+                                  {
+                                      return a.coord1.first <= value;
+                                  });
+
+            /* If we have at least one value that is greater than the min value
+             * of the x coordinate of the rectange. */
+            if (itX != vSameX.end())
             {
-                /* Check if they are present */
-                if (checkIfOnLine(make_pair(cnt3, cnt2)) == false && 
-                    checkIfInside(make_pair(cnt3, cnt2)) == false)
+                /* Assume that there is no line cutting through the rectangle
+                 * from - 
+                 * (nMinX, nMinY) to (nMaxX, nMinY) and 
+                 * (nMinX, nMaxY) to (nMaxX, nMaxY) 
+                 * 
+                 *                       cut line
+                 *                         |
+                 * (nMinX, nMinY) ---------+--------- (nMaxX, nMinY)
+                 *       |                 |                |
+                 *       |                                  |
+                 *       |                                  |
+                 *       |                 |                |
+                 * (nMinX, nMaxY) ---------+--------- (nMaxX, nMaxY)
+                 *                         |
+                 *                        cut line
+                */
+                bool bPointsValid = true;
+                for (auto x = itX; x != vSameX.end() && x->coord1.first < nMaxX; x++)
                 {
-                    break;
+                    /* If we have some x coordinate that is still equal to the 
+                     * minimum x coordinate of the rectangle, then do not do
+                     * anything */
+                    if (x->coord1.first <= nMinX)
+                    {
+                        continue;
+                    }
+                    /* If the line cuts through the bottom side of the rectangle */
+                    if (min(x->coord1.second, x->coord2.second) < nMinY &&
+                        max(x->coord1.second, x->coord2.second) > nMinY)
+                    {
+                        /* Mark that the rectange is not valid and break */
+                        bPointsValid = false;
+                        break;
+                    }
+                    /* If the line cuts through the top side of the rectangle */
+                    if (min(x->coord1.second, x->coord2.second) < nMaxY &&
+                        max(x->coord1.second, x->coord2.second) > nMaxY)
+                    {
+                        /* Mark that the rectange is not valid and break */
+                        bPointsValid = false;
+                        break;
+                    }
                 }
-            }
-            /* If not, check move to the next point pair */
-            if (cnt2 < (max(topPointPair.coord1.second, topPointPair.coord2.second) + 1))
-            {
-                continue;
+                /* If we found that the rectangle is not valid, continue to next 
+                 * point pair */
+                if (bPointsValid == false)
+                {
+                    continue;
+                }
             }
 
-            /* Next, freeze x coordinate to max x:
-             * max(x1, x2) : min(y1, y2) to max(y1, y2)
+            /* Now, do the same for y coordinates
+             * Get the first value of (x, y) that has y value greater than min
+             * value of the y coordinate of the rectange. 
+             * lower_bound gives us the first value that is greater than the 
+             * given value.
+             * It uses binary search internally, so it is efficient.
              */
-            cnt3 = max(topPointPair.coord1.first, topPointPair.coord2.first);
-            for (cnt2 = min(topPointPair.coord1.second, topPointPair.coord2.second);
-                 cnt2 <= max(topPointPair.coord1.second, topPointPair.coord2.second);
-                 cnt2++)
+            auto itY = lower_bound(vSameY.begin(), vSameY.end(), nMinY,
+                                  [](const PointPairs& a, const int64_t& value)
+                                  {
+                                      return a.coord1.second <= value;
+                                  });
+            /* If we have at least one value that is greater than the min value
+             * of the y coordinate of the rectange. */
+            if (itY != vSameY.end())
             {
-                /* Check if they are present */
-                if (checkIfOnLine(make_pair(cnt3, cnt2)) == false && 
-                    checkIfInside(make_pair(cnt3, cnt2)) == false)
+                /* Assume that there is no line cutting through the rectangle
+                 * from - 
+                 * (nMinX, nMinY) to (nMinX, nMaxY) and 
+                 * (nMaxX, nMinY) to (nMaxX, nMaxY) 
+                 * 
+                 * (nMinX, nMinY) ----------------------- (nMaxX, nMinY)
+                 *       |                                   |
+                 *       |                                   |
+                 *    ---+--- cut line                    ---+--- cut line
+                 *       |                                   |
+                 *       |                                   |
+                 * (nMinX, nMaxY) ----------------------- (nMaxX, nMaxY)
+                 *                           
+                */
+                bool bPointsValid = true;
+                for (auto y = itY; y != vSameY.end() && y->coord1.second < nMaxY; y++)
                 {
-                    break;
+                    /* If we have some y coordinate that is still equal to the 
+                     * minimum y coordinate of the rectangle, then do not do
+                     * anything */
+                    if (y->coord1.second <= nMinY)
+                    {
+                        continue;
+                    }
+                    /* If the line cuts through the left side of the rectangle */
+                    if (min(y->coord1.first, y->coord2.first) < nMinX &&
+                        max(y->coord1.first, y->coord2.first) > nMinX)
+                    {
+                        /* Mark that the rectange is not valid and break */
+                        bPointsValid = false;
+                        break;
+                    }
+                    /* If the line cuts through the right side of the rectangle */
+                    if (min(y->coord1.first, y->coord2.first) < nMaxX &&
+                        max(y->coord1.first, y->coord2.first) > nMaxX)
+                    {
+                        /* Mark that the rectange is not valid and break */
+                        bPointsValid = false;
+                        break;
+                    }
                 }
-            }
-            /* If not, check move to the next point pair */
-            if (cnt2 < (max(topPointPair.coord1.second, topPointPair.coord2.second) + 1))
-            {
-                continue;
-            }
-
-            /* Next, freeze y coordinate to min y:
-             * min(y1, y2) : min(x1, x2) to max(x1, x2)
-             */
-            cnt3 = min(topPointPair.coord1.second, topPointPair.coord2.second);
-            for (cnt2 = min(topPointPair.coord1.first, topPointPair.coord2.first);
-                 cnt2 <= max(topPointPair.coord1.first, topPointPair.coord2.first);
-                 cnt2++)
-            {
-                /* Check if they are present */
-                if (checkIfOnLine(make_pair(cnt2, cnt3)) == false && 
-                    checkIfInside(make_pair(cnt2, cnt3)) == false)
+                /* If we found that the rectangle is not valid, continue to next 
+                 * point pair */
+                if (bPointsValid == false)
                 {
-                    break;
+                    continue;
                 }
-            }
-            /* If not, check move to the next point pair */
-            if (cnt2 < (max(topPointPair.coord1.first, topPointPair.coord2.first) + 1))
-            {
-                continue;
-            }
-
-            /* Finally, freeze y coordinate to max y:
-             * max(y1, y2) : min(x1, x2) to max(x1, x2)
-             */
-            cnt3 = max(topPointPair.coord1.second, topPointPair.coord2.second);
-            for (cnt2 = min(topPointPair.coord1.first, topPointPair.coord2.first);
-                 cnt2 <= max(topPointPair.coord1.first, topPointPair.coord2.first);
-                 cnt2++)
-            {
-                /* Check if they are present */
-                if (checkIfOnLine(make_pair(cnt2, cnt3)) == false && 
-                    checkIfInside(make_pair(cnt2, cnt3)) == false)
-                {
-                    break;
-                }
-            }
-            /* If not, check move to the next point pair */
-            if (cnt2 < (max(topPointPair.coord1.first, topPointPair.coord2.first) + 1))
-            {
-                continue;
             }
 
             /* If we reach here, it means all four sides are either on the line
