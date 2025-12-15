@@ -538,7 +538,7 @@ int main(void)
                         continue;
                     }
                     /* If the line cuts through the bottom side of the rectangle */
-                    if (min(x->coord1.second, x->coord2.second) < nMinY &&
+                    if (min(x->coord1.second, x->coord2.second) <= nMinY &&
                         max(x->coord1.second, x->coord2.second) > nMinY)
                     {
                         /* Mark that the rectange is not valid and break */
@@ -547,7 +547,7 @@ int main(void)
                     }
                     /* If the line cuts through the top side of the rectangle */
                     if (min(x->coord1.second, x->coord2.second) < nMaxY &&
-                        max(x->coord1.second, x->coord2.second) > nMaxY)
+                        max(x->coord1.second, x->coord2.second) >= nMaxY)
                     {
                         /* Mark that the rectange is not valid and break */
                         bPointsValid = false;
@@ -603,7 +603,7 @@ int main(void)
                         continue;
                     }
                     /* If the line cuts through the left side of the rectangle */
-                    if (min(y->coord1.first, y->coord2.first) < nMinX &&
+                    if (min(y->coord1.first, y->coord2.first) <= nMinX &&
                         max(y->coord1.first, y->coord2.first) > nMinX)
                     {
                         /* Mark that the rectange is not valid and break */
@@ -612,7 +612,7 @@ int main(void)
                     }
                     /* If the line cuts through the right side of the rectangle */
                     if (min(y->coord1.first, y->coord2.first) < nMaxX &&
-                        max(y->coord1.first, y->coord2.first) > nMaxX)
+                        max(y->coord1.first, y->coord2.first) >= nMaxX)
                     {
                         /* Mark that the rectange is not valid and break */
                         bPointsValid = false;
